@@ -40,9 +40,9 @@ def call(String buildStatus, Boolean alertTech = false) {
   def gitLink = "https://github.com/Futurelearn/${repo}/commit/${env.GIT_COMMIT}"
   def commit = "${gitTitle}\n(<${gitLink}|${gitSha}> / ${env.GIT_BRANCH})"
 
-  def mailSubject = "Jenkins build ${status}: ${env.JOB_URL}"
+  def mailSubject = "Jenkins build ${status}: Futurelearn/${repo}"
   def mailBody = """
-  Build ${env.BUILD_ID} ${status}: ${env.JOB_URL}
+  Build ${env.BUILD_ID} ${status}: ${env.RUN_DISPLAY_URL}
   Branch: ${env.GIT_BRANCH}
   Committer: ${author}
   Repository: Futurelearn/${repo}
@@ -55,7 +55,7 @@ def call(String buildStatus, Boolean alertTech = false) {
       fallback: "Jenkins build ${env.BUILD_ID} ${status}",
       color: color,
       title: "Futurelearn/${repo} (#${env.BUILD_ID})",
-      title_link: env.BUILD_URL,
+      title_link: env.RUN_DISPLAY_URL,
       fields: [
         [
           title: 'Status',
