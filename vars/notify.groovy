@@ -10,13 +10,17 @@ def call(String buildStatus, Boolean alertTech = false) {
   // build status of null means successful
   buildStatus = buildStatus ?: 'SUCCESS'
 
-  int seconds = currentBuild.duration / 1000
-  if (seconds < 60) {
-    timeTaken = "${seconds}s"
-  } else if (seconds < 3600) {
-    timeTaken = "${seconds / 60}m ${seconds %60}s"
+  ms = currentBuild.duration
+  seconds = (int) (ms / 1000)
+  minutes = (int) (seconds / 60)
+  hours = (int) (minutes / 60)
+
+  if (ms / 1000 < 60) {
+    timeTaken = "${seconds % 60}s"
+  } else if (ms / 1000 < 3600) {
+    timeTaken = "${minutes % 60}m ${seconds % 60}s"
   } else {
-    timeTaken = "${seconds / 3600}h ${seconds / 60}m ${seconds %60}s"
+    timeTaken = "${hours % 60}h ${minutes % 60}m ${seconds % 60}s"
   }
 
   if (buildStatus == 'SUCCESS' && currentBuild.previousBuild.result == 'FAILURE') {
