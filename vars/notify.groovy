@@ -8,7 +8,9 @@
 
 def call(String buildStatus, Boolean alertTech = false) {
   // build status of null means successful
-  buildStatus = buildStatus ?: 'SUCCESS'
+  if (buildStatus == null) {
+    buildStatus = 'SUCCESS'
+  }
 
   ms = currentBuild.duration
   seconds = (int) (ms / 1000)
