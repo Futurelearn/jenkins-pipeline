@@ -6,7 +6,7 @@
 * Inspiration from https://jenkins.io/blog/2017/02/15/declarative-notifications/
 */
 
-def call(String buildStatus, Boolean alertTech = false) {
+def call(String buildStatus = 'UNSTABLE', Boolean alertTech = false) {
   // build status of null means successful
   if (buildStatus == null) {
     buildStatus = 'SUCCESS'
