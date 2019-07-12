@@ -6,8 +6,9 @@
 * Inspiration from https://jenkins.io/blog/2017/02/15/declarative-notifications/
 */
 
-def call(String buildStatus, Boolean alertTech = false) {
+def call(String channel, Boolean alertEveryone = false) {
   // build status of null means successful
+  buildStatus = currentBuild.result
   if (buildStatus == null) {
     buildStatus = 'SUCCESS'
   }
@@ -31,18 +32,26 @@ def call(String buildStatus, Boolean alertTech = false) {
     if (currentBuild.previousBuild.result == 'FAILURE' && buildStatus == 'SUCCESS') {
       buildStatus = 'RECOVERED'
     }
+
+    if (currentBuild.previousBuild.result == 'SUCCESS' && buildStatus == 'FAILURE') {
+      buildStatus = 'REGRESSION'
+    }
   }
 
   if (buildStatus == 'RECOVERED') {
     status = 'Recovered'
     color = 'good'
     message = ":sweat_smile: Recovered (${timeTaken}) :nail_care:"
+  } else if (buildStatus == 'REGRESSION') {
+    status = 'Failed'
+    color = 'danger'
+    message = ":disappointed: Failed (${timeTaken}) :rotating_thinking_face:"
   } else if (buildStatus == 'SUCCESS') {
     status = 'Success'
     color = 'good'
-    message = ":tada: Succeeded (${timeTaken}) :tada:"
+    message = ":tada: Succeeded (${timeTaken}) :panda-dance:"
   } else {
-    status = 'failed'
+    status = 'Failed'
     color = 'danger'
     message = ":crying_cat_face: Failed (${timeTaken}) :sadparrot:"
   }
@@ -91,17 +100,24 @@ def call(String buildStatus, Boolean alertTech = false) {
   ]
 
   // Send notifications
-  slackSend (channel: '#notifications', attachments: attachments)
+  slackSend (channel: channel, attachments: attachments)
 
-  if (env.GIT_BRANCH == 'master' && alertTech == true) {
-    if (buildStatus == 'SUCCESS' && currentBuild.previousBuild.result == 'FAILURE') {
+  if (env.GIT_BRANCH == 'master' && alertEveryone == true) {
+    if (buildStatus == 'RECOVERED') {
       emailext (
           to: 'tech+jenkins@futurelearn.com',
           subject: mailSubject,
           body: mailBody,
         )
       slackSend (channel: '#tech', attachments: attachments)
-    } else if (buildStatus == 'FAILURE' && currentBuild.previousBuild.result == 'SUCCESS') {
+    } else if (buildStatus == 'REGRESSION') {
+      emailext (
+          to: 'tech+jenkins@futurelearn.com',
+          subject: mailSubject,
+          body: mailBody,
+        )
+      slackSend (channel: '#tech', attachments: attachments)
+    } else if (buildStatus == 'FAILURE' && buildStatus.previousBuild == null) {
       emailext (
           to: 'tech+jenkins@futurelearn.com',
           subject: mailSubject,
