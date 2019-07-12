@@ -6,7 +6,7 @@
 * Inspiration from https://jenkins.io/blog/2017/02/15/declarative-notifications/
 */
 
-def call(String buildStatus = 'UNSTABLE', Boolean alertTech = false) {
+def call(String buildStatus, Boolean alertTech = false) {
   // build status of null means successful
   if (buildStatus == null) {
     buildStatus = 'SUCCESS'
@@ -25,7 +25,15 @@ def call(String buildStatus = 'UNSTABLE', Boolean alertTech = false) {
     timeTaken = "${hours % 60}h ${minutes % 60}m ${seconds % 60}s"
   }
 
-  if (buildStatus == 'SUCCESS' && currentBuild.previousBuild.result == 'FAILURE') {
+  // Jenkins will error if it tries to access currentBuild.previousBuild.result
+  // on null
+  if (currentBuild.previousBuild != null) {
+    if (currentBuild.previousBuild.result == 'FAILURE' && buildStatus == 'SUCCESS') {
+      buildStatus = 'RECOVERED'
+    }
+  }
+
+  if (buildStatus == 'RECOVERED') {
     status = 'Recovered'
     color = 'good'
     message = ":sweat_smile: Recovered (${timeTaken}) :nail_care:"
