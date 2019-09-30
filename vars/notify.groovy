@@ -117,7 +117,7 @@ def call(String channel, Boolean alertEveryone = false) {
           body: mailBody,
         )
       slackSend (channel: '#tech', attachments: attachments)
-    } else if (buildStatus == 'FAILURE' && buildStatus.previousBuild == null) {
+    } else if (buildStatus == 'FAILURE') {
       emailext (
           to: 'tech+jenkins@futurelearn.com',
           subject: mailSubject,
