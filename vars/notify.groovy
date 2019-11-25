@@ -103,11 +103,7 @@ def call(String channel, Boolean alertEveryone = false) {
   slackSend (channel: channel, attachments: attachments)
 
   if (env.GIT_BRANCH == 'master' && alertEveryone == true) {
-    if (buildStatus == 'RECOVERED') {
-      slackSend (channel: '#tech', attachments: attachments)
-    } else if (buildStatus == 'REGRESSION') {
-      slackSend (channel: '#tech', attachments: attachments)
-    } else if (buildStatus == 'FAILURE') {
+    if (buildStatus == 'RECOVERED' || buildStatus == 'REGRESSION' || buildStatus == 'FAILURE') {
       slackSend (channel: '#tech', attachments: attachments)
     }
   }
