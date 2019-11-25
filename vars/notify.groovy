@@ -104,25 +104,10 @@ def call(String channel, Boolean alertEveryone = false) {
 
   if (env.GIT_BRANCH == 'master' && alertEveryone == true) {
     if (buildStatus == 'RECOVERED') {
-      emailext (
-          to: 'tech+jenkins@futurelearn.com',
-          subject: mailSubject,
-          body: mailBody,
-        )
       slackSend (channel: '#tech', attachments: attachments)
     } else if (buildStatus == 'REGRESSION') {
-      emailext (
-          to: 'tech+jenkins@futurelearn.com',
-          subject: mailSubject,
-          body: mailBody,
-        )
       slackSend (channel: '#tech', attachments: attachments)
     } else if (buildStatus == 'FAILURE') {
-      emailext (
-          to: 'tech+jenkins@futurelearn.com',
-          subject: mailSubject,
-          body: mailBody,
-        )
       slackSend (channel: '#tech', attachments: attachments)
     }
   }
